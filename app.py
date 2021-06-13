@@ -3,7 +3,9 @@ import os
 import requests
 from flask import Flask, render_template, abort, request
 
-# @TODO Import your Ingestor and MemeEngine classes
+from MemeGenerator.meme_generator import MemeEngine
+from QuoteEngine.ingestor import Ingestor
+from QuoteEngine.quote import QuoteModel
 
 app = Flask(__name__)
 
@@ -15,18 +17,17 @@ def setup():
 
     quote_files = ['./_data/DogQuotes/DogQuotesTXT.txt',
                    './_data/DogQuotes/DogQuotesDOCX.docx',
-                   './_data/DogQuotes/DogQuotesPDF.pdf',
+                   # './_data/DogQuotes/DogQuotesPDF.pdf',
                    './_data/DogQuotes/DogQuotesCSV.csv']
 
-    # TODO: Use the Ingestor class to parse all files in the
-    # quote_files variable
-    quotes = None
+    quotes = []
+    for file in quote_files:
+        quotes.extend(Ingestor.parse(file))
 
     images_path = "./_data/photos/dog/"
 
-    # TODO: Use the pythons standard library os class to find all
-    # images within the images images_path directory
-    imgs = None
+    img_paths = next(os.walk(images_path))[2]
+    imgs = [os.path.join(images_path, img_path) for img_path in img_paths]
 
     return quotes, imgs
 
@@ -38,13 +39,9 @@ quotes, imgs = setup()
 def meme_rand():
     """ Generate a random meme """
 
-    # @TODO:
-    # Use the random python standard library class to:
-    # 1. select a random image from imgs array
-    # 2. select a random quote from the quotes array
+    img = random.choice(imgs)
+    quote = random.choice(quotes)
 
-    img = None
-    quote = None
     path = meme.make_meme(img, quote.body, quote.author)
     return render_template('meme.html', path=path)
 
@@ -59,14 +56,14 @@ def meme_form():
 def meme_post():
     """ Create a user defined meme """
 
-    # @TODO:
-    # 1. Use requests to save the image from the image_url
-    #    form param to a temp local file.
-    # 2. Use the meme object to generate a meme using this temp
-    #    file and the body and author form paramaters.
-    # 3. Remove the temporary saved image.
+    quote = QuoteModel(request.form['body'], request.form['author'])
+    img_url = requests.get(request.form['image_url'])
+    path_tmp = './tmp/image_temp.png'
 
-    path = None
+    with open(path_tmp, 'wb') as tmp_img:
+        tmp_img.write(img_url.content)
+
+    path = meme.make_meme(path_tmp, quote.author, quote.body)
 
     return render_template('meme.html', path=path)
 
