@@ -28,7 +28,7 @@ pip install -r requirements.txt
 ```
 
 ## Main Files: Project Structure
-
+```sh
 ├── README.md
 ├── main.py ** the main driver of the app. The memes are generated here.
 ├── app.py ** routing setup for web application.
@@ -51,4 +51,4 @@ pip install -r requirements.txt
 ├── templates
 ├── tmp
 └── venv
-
+```
