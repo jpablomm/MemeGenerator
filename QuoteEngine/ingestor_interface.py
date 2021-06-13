@@ -8,6 +8,10 @@ class IngestorInterface(ABC):
     @classmethod
     def can_ingest(cls, path):
         """Confirm if file type is allowed"""
+        try:
+            open(path)
+        except Exception:
+            raise Exception('File not found.')
         extension = path.split('.')[-1]
         return extension in cls.allowed_extensions
 

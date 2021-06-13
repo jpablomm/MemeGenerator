@@ -11,6 +11,7 @@ class CSVIngestor(IngestorInterface):
     @classmethod
     def parse(cls, path):
         """Read csv file and return list quotes"""
+        
         if not cls.can_ingest(path):
             raise Exception('File extension not compatible')
 
